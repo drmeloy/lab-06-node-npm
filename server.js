@@ -39,10 +39,19 @@ const toLocation = (geoData) => {
 };
 
 const toLocationWeather = (darkSky) => {
-    return {
-        forecast: darkSky.hourly.summary,
-        time: Date(darkSky.hourly.data[0]),
-    };
+    const data = darkSky.hourly.data;
+    let dayData = [];
+
+    data.forEach(day => {
+        let dayObject = {};
+
+        dayObject.forecast = day.summary;
+        dayObject.time = Date(day.time);
+
+        dayData.push(dayObject);
+    });
+    
+    return dayData;
 };
 
 // app.use(express.static('./public'));
