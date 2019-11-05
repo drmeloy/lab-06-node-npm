@@ -11,7 +11,7 @@ app.use(cors());
 const geoData = require('./data/geo.json');
 
 const getLatLng = (location) => {
-    if (location == 'bad location'){
+    if (location === 'bad location'){
         throw new Error();
     }
 
