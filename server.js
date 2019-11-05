@@ -29,7 +29,7 @@ const toLocation = (geoData) => {
     };
 }
 
-app.use(express.static('./public'));
+// app.use(express.static('./public'));
 
 app.get('./location', (request, response) => {
     try {
