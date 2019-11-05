@@ -24,7 +24,7 @@ const getLatLngWeather = (location) => {
         throw new Error();
     }
 
-    return toLocation(darkSky);
+    return toLocationWeather(darkSky);
 };
 
 const toLocation = (geoData) => {
@@ -36,7 +36,14 @@ const toLocation = (geoData) => {
         latitude: geometry.location.lat,
         longitude: geometry.location.lng
     };
-}
+};
+
+const toLocationWeather = (darkSky) => {
+    return {
+        forecast: darkSky.hourly.summary,
+        time: Date(darkSky.hourly.data[0].time),
+    };
+};
 
 // app.use(express.static('./public'));
 
