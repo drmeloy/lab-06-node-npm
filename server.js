@@ -39,7 +39,7 @@ const toLocation = (geoData) => {
 };
 
 const toLocationWeather = (darkSky) => {
-    const data = darkSky.hourly.data;
+    const data = darkSky.daily.data;
     let dayData = [];
 
     data.forEach(day => {
@@ -63,7 +63,7 @@ app.get('/location', (request, response) => {
         response.status(200).json(result);
     }
     catch (err){
-        response.status(500).send('Sorry, something in da location dun fked');
+        response.status(500).send('Sorry, we were unable to find that location. Please try again with another location.');
     }
 });
 
@@ -74,7 +74,7 @@ app.get('/weather', (request, response) => {
         response.status(200).json(result);
     }
     catch (err){
-        response.status(500).send('Sorry, something in da weather dun fked');
+        response.status(500).send('Sorry, we were unable to collect weather information for that location. Please try again with another location.');
     }
 });
 
