@@ -41,7 +41,7 @@ const toLocation = (geoData) => {
 const toLocationWeather = (darkSky) => {
     return {
         forecast: darkSky.hourly.summary,
-        time: Date(darkSky.hourly.data[0].time),
+        time: Date(darkSky.hourly.data),
     };
 };
 
