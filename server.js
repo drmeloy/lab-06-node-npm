@@ -41,7 +41,7 @@ const toLocation = (geoData) => {
 const toLocationWeather = (darkSky) => {
     return {
         forecast: darkSky.hourly.summary,
-        time: Date(darkSky.hourly.data),
+        time: Date(darkSky.hourly.data[0]),
     };
 };
 
@@ -60,7 +60,7 @@ app.get('/location', (request, response) => {
 
 app.get('/weather', (request, response) => {
     try {
-        const location = request.query.weather;
+        const location = request.query.location;
         const result = getLatLngWeather(location);
         response.status(200).json(result);
     }
