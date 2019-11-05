@@ -29,9 +29,9 @@ const toLocation = (geoData) => {
     };
 }
 
-app.use(express.static('./public'));
+// app.use(express.static('./public'));
 
-app.get('./location', (request, response) => {
+app.get('/location', (request, response) => {
     try {
         const location = request.query.location;
         const result = getLatLng(location);
