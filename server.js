@@ -47,7 +47,7 @@ app.get('/location', (request, response) => {
         response.status(200).json(result);
     }
     catch (err){
-        response.status(500).send('Sorry, something dun fked');
+        response.status(500).send('Sorry, something in da location dun fked');
     }
 });
 
@@ -58,7 +58,7 @@ app.get('/weather', (request, response) => {
         response.status(200).json(result);
     }
     catch (err){
-        response.status(500).send('Sorry, something dun fked');
+        response.status(500).send('Sorry, something in da weather dun fked');
     }
 });
 
