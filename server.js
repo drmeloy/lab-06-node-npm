@@ -12,7 +12,7 @@ const geoData = require('./data/geo.json');
 const darkSky = require('./data/darksky.json');
 
 const getLatLng = (location) => {
-    if (location === 'bad location'){
+    if (location == 'bad location'){
         throw new Error();
     }
 
@@ -20,7 +20,7 @@ const getLatLng = (location) => {
 };
 
 const getLatLngWeather = (location) => {
-    if (location === 'bad location'){
+    if (location == 'bad location'){
         throw new Error();
     }
 
