@@ -75,6 +75,36 @@ const formatYelpData = (yelpData) => {
     return yelpDataArray;
 };
 
+const formatTrailsData = (trailsData) => {
+    let trailsDataArray = [];
+
+    for (let i = 0; i < 10; i++){
+        let trailName = trailsData.trails[i].name;
+        let trailLocation = trailsData.trails[i].location;
+        let trailLength = trailsData.trails[i].length;
+        let trailStars = trailsData.trails[i].stars;
+        let trailStarVotes = trailsData.trails[i].starVotes;
+        let trailSummary = trailsData.trails[i].summary;
+        let trailURL = trailsData.trails[i].url;
+        let trailConditions = trailsData.trails[i].conditionDetails;
+        let trailConditionDateTime = trailsData.trails[i].conditionDate;
+        let trailObject = {
+            name: trailName,
+            location: trailLocation,
+            length: trailLength,
+            stars: trailStars,
+            star_votes: trailStarVotes,
+            summary: trailSummary,
+            trail_url: trailURL,
+            conditions: trailConditions,
+            condition_date: trailConditionDateTime,
+            condition_time: trailConditionDateTime
+        };
+        trailsDataArray.push(trailObject);
+    }
+    return trailsDataArray;
+};
+
 app.get('/location', async(req, res) => {
     const searchQuery = req.query.search;
     const GEOCODE_API_KEY = process.env.GEOCODE_API_KEY;
@@ -103,6 +133,14 @@ app.get('/reviews', async(req, res) => {
     const actualYelpData = JSON.parse(yelpData.text);
     const formattedYelpData = formatYelpData(actualYelpData);
     res.json(formattedYelpData);    
+});
+
+app.get('/trails', async(req, res) => {
+    const trailsData = await superagent.get(`https://www.hikingproject.com/data/get-trails?lat=${latLngs.latitude}&lon=${latLngs.longitude}&maxDistance=200&key=${process.env.HIKING_API_KEY}`);
+    const actualTrailsData = JSON.parse(trailsData.text);
+    const formattedTrailsData = formatTrailsData(actualTrailsData);
+    res.json(formattedTrailsData);
+    console.log(actualTrailsData);
 });
 
 app.listen(PORT, () => {
