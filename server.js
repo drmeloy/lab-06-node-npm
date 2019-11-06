@@ -47,6 +47,34 @@ const getWeatherResponse = async(lat, lng) => {
     return dayData;
 };
 
+const formatEventsData = (eventsData) => {
+    
+};
+
+const formatYelpData = (yelpData) => {
+    let yelpDataArray = [];
+
+    for (let i = 0; i < 20; i++){
+        let businessName = yelpData.businesses[i].name;
+        let businessImageURL = yelpData.businesses[i].image_url;
+        let businessPrice = yelpData.businesses[i].price;
+        let businessRating = yelpData.businesses[i].rating;
+        let businessURL = yelpData.businesses[i].url;
+
+        let businessObject = {
+            name: businessName,
+            image_url: businessImageURL,
+            price: businessPrice,
+            rating: businessRating,
+            url: businessURL
+        };
+        
+        yelpDataArray.push(businessObject);
+    }
+
+    return yelpDataArray;
+};
+
 app.get('/location', async(req, res) => {
     const searchQuery = req.query.search;
     const GEOCODE_API_KEY = process.env.GEOCODE_API_KEY;
@@ -60,6 +88,21 @@ app.get('/location', async(req, res) => {
 app.get('/weather', async(req, res) => {
     const weatherObject = await getWeatherResponse(latLngs.latitude, latLngs.longitude);
     res.json(weatherObject);
+});
+
+app.get('/events', async(req, res) => {
+    const eventsData = await superagent.get(`https://www.eventbriteapi.com/v3/events/search?location.latitude=${latLngs.latitude}&location.longitude=${latLngs.longitude}`)
+        .set('Authorization', `Bearer /v3/users/me/?token=${process.env.EVENTBRITE_API_KEY}`);
+
+    const formattedEventsData = formatEventsData(eventsData);
+});
+
+app.get('/reviews', async(req, res) => {
+    const yelpData = await superagent.get(`https://api.yelp.com/v3/businesses/search?latitude=${latLngs.latitude}&longitude=${latLngs.longitude}`)
+        .set('Authorization', `Bearer ${process.env.YELP_API_KEY}`);
+    const actualYelpData = JSON.parse(yelpData.text);
+    const formattedYelpData = formatYelpData(actualYelpData);
+    res.json(formattedYelpData);    
 });
 
 app.listen(PORT, () => {
