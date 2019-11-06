@@ -4,14 +4,10 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 const superagent = require('superagent');
-
-
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 
-// const geoData = require('./data/geo.json');
-// const darkSky = require('./data/darksky.json');
 let latLngs;
 
 const formatLocationResponse = (locationItem) => {
@@ -32,41 +28,24 @@ const formatLocationResponse = (locationItem) => {
     };
 };
 
-const getLatLng = (location) => {
-    if (location === 'bad location'){
-        throw new Error();
-    }
+const getWeatherResponse = async(lat, lng) => {
+    const weatherData = await superagent.get(`https://api.darksky.net/forecast/${process.env.DARKSKY_API_KEY}/${lat},${lng}`);
+    const actualWeatherData = JSON.parse(weatherData.text);
+    const dailyArray = actualWeatherData.daily.data;
 
-    return toLocation(geoData);
-};
-
-const getLatLngWeather = (location) => {
-    if (location === 'bad location'){
-        throw new Error();
-    }
-
-    return toLocationWeather(darkSky);
-};
-
-
-
-const toLocationWeather = (darkSky) => {
-    const data = darkSky.daily.data;
     let dayData = [];
 
-    data.map(day => {
+    dailyArray.map(day => {
         let dayObject = {};
 
         dayObject.forecast = day.summary;
-        dayObject.time = Date(day.time);
+        dayObject.time = new Date(day.time * 1000).toDateString();
 
         dayData.push(dayObject);
     });
     
     return dayData;
 };
-
-// app.use(express.static('./public'));
 
 app.get('/location', async(req, res) => {
     const searchQuery = req.query.search;
@@ -78,15 +57,9 @@ app.get('/location', async(req, res) => {
     res.json(response);
 });
 
-app.get('/weather', (request, response) => {
-    try {
-        const location = request.query.search;
-        const result = getLatLngWeather(location);
-        response.status(200).json(result);
-    }
-    catch (err){
-        response.status(500).send('Sorry, we were unable to collect weather information for that location. Please try again with another location.');
-    }
+app.get('/weather', async(req, res) => {
+    const weatherObject = await getWeatherResponse(latLngs.latitude, latLngs.longitude);
+    res.json(weatherObject);
 });
 
 app.listen(PORT, () => {
