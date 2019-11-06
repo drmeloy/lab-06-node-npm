@@ -3,13 +3,34 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const app = express();
+const superagent = require('superagent');
+
 
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 
-const geoData = require('./data/geo.json');
-const darkSky = require('./data/darksky.json');
+// const geoData = require('./data/geo.json');
+// const darkSky = require('./data/darksky.json');
+let latLngs;
+
+const formatLocationResponse = (locationItem) => {
+    const {
+        geometry: {
+            location: {
+                lat,
+                lng,
+            },
+        },
+        formatted_address,
+    } = locationItem;
+
+    return {
+        formatted_query: formatted_address,
+        latitude: lat,
+        longitude: lng
+    };
+};
 
 const getLatLng = (location) => {
     if (location === 'bad location'){
@@ -27,22 +48,13 @@ const getLatLngWeather = (location) => {
     return toLocationWeather(darkSky);
 };
 
-const toLocation = (geoData) => {
-    const firstResult = geoData.results[0];
-    const geometry = firstResult.geometry;
 
-    return {
-        formatted_query: firstResult.formatted_address,
-        latitude: geometry.location.lat,
-        longitude: geometry.location.lng
-    };
-};
 
 const toLocationWeather = (darkSky) => {
     const data = darkSky.daily.data;
     let dayData = [];
 
-    data.forEach(day => {
+    data.map(day => {
         let dayObject = {};
 
         dayObject.forecast = day.summary;
@@ -56,20 +68,19 @@ const toLocationWeather = (darkSky) => {
 
 // app.use(express.static('./public'));
 
-app.get('/location', (request, response) => {
-    try {
-        const location = request.query.search;
-        const result = getLatLng(location);
-        response.status(200).json(result);
-    }
-    catch (err){
-        response.status(500).send('Sorry, we were unable to find that location. Please try again with another location.');
-    }
+app.get('/location', async(req, res) => {
+    const searchQuery = req.query.search;
+    const GEOCODE_API_KEY = process.env.GEOCODE_API_KEY;
+    const locationItem = await superagent.get(`https://maps.googleapis.com/maps/api/geocode/json?address=${searchQuery}&key=${GEOCODE_API_KEY}`);
+    const actualItem = JSON.parse(locationItem.text).results[0];
+    const response = formatLocationResponse(actualItem);
+    latLngs = response;
+    res.json(response);
 });
 
 app.get('/weather', (request, response) => {
     try {
-        const location = request.query.location;
+        const location = request.query.search;
         const result = getLatLngWeather(location);
         response.status(200).json(result);
     }
